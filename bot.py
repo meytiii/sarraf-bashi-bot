@@ -116,7 +116,7 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def main_async():
     print("Starting Code Picasso Bot runtime...")
-    app = Application.builder().token(TOKEN).build()
+    app = Application.builder().token(TOKEN).read_timeout(30.0).write_timeout(30.0).connect_timeout(30.0).build()
     
     app.add_handler(CommandHandler("start", start_command))
     app.add_handler(CommandHandler("help", help_command))

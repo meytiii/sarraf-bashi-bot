@@ -1,5 +1,5 @@
 import io
-import requests
+import httpx
 
 async def generate_code_image(code_text: str, theme: str = "monokai"):
     try:
@@ -14,7 +14,8 @@ async def generate_code_image(code_text: str, theme: str = "monokai"):
             "paddingHorizontal": "30px"
         }
         
-        response = requests.post(api_url, json=payload)
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            response = await client.post(api_url, json=payload)
         
         if response.status_code == 200:
             return io.BytesIO(response.content)
