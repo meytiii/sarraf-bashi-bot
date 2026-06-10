@@ -83,7 +83,3 @@ python bot.py
 ```
 
 ---
-
-Now that the repository profile is updated, are you ready to write the core `bot.py` listener file for **Phase 3**?
-
-```
