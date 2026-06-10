@@ -81,5 +81,3 @@ python bot.py
 👨‍💻 Maintained by [@acantgemini-oss](https://github.com/acantgemini-oss) | Try it out on Telegram: [@CodePicasso_bot](https://www.google.com/search?q=https://t.me/CodePicasso_bot)
 
 ```
-
----
