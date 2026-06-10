@@ -1,11 +1,3 @@
-**TL;DR:** Here is your updated, fully tailored `README.md` containing your exact repository URL, GitHub organization name, and official Telegram bot handle.
-
-You can overwrite your current repository file with this text to ensure all paths and installation instructions line up perfectly with your deployment setup.
-
----
-
-### New `README.md` Code
-
 # 🎨 Code Picasso (@CodePicasso_bot)
 
 `Code Picasso` is an automated, zero-cost Telegram bot that transforms ugly, raw code blocks shared in chats into beautifully syntax-highlighted carbon-copy images. It operates completely locally without external paid APIs, making it highly efficient and lightweight.
@@ -91,7 +83,3 @@ python bot.py
 ```
 
 ---
-
-Now that the repository profile is updated, are you ready to write the core `bot.py` listener file for **Phase 3**?
-
-```
