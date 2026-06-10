@@ -3,6 +3,8 @@ from pygments import highlight
 from pygments.lexers import guess_lexer
 from pygments.formatters import ImageFormatter
 from pygments.util import ClassNotFound
+import os
+import urllib.request
 
 async def generate_code_image(code_text: str, theme: str = "monokai"):
     """Renders the code canvas using pure Python. Zero external browsers required."""
@@ -24,6 +26,14 @@ async def generate_code_image(code_text: str, theme: str = "monokai"):
             from pygments.lexers.special import TextLexer
             lexer = TextLexer()
 
+        font_filename = "UbuntuMono-Regular.ttf"
+        font_path = os.path.abspath(font_filename)
+        
+        if not os.path.exists(font_path):
+            print("📥 [FONT] Downloading UbuntuMono font for the cloud server...")
+            font_url = "https://github.com/google/fonts/raw/main/ofl/ubuntumono/UbuntuMono-Regular.ttf"
+            urllib.request.urlretrieve(font_url, font_path)
+
         formatter = ImageFormatter(
             style=selected_style,
             font_size=20,
@@ -32,7 +42,7 @@ async def generate_code_image(code_text: str, theme: str = "monokai"):
             line_number_fg="#888888",
             background_color=bg_color,
             line_pad=10,
-            font_name="Courier New" 
+            font_name=font_path 
         )
 
         image_bytes = highlight(code_text, lexer, formatter)
