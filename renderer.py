@@ -5,6 +5,8 @@ from pygments.formatters import ImageFormatter
 from pygments.util import ClassNotFound
 import os
 import urllib.request
+import urllib.parse
+import httpx
 
 async def generate_code_image(code_text: str, theme: str = "monokai"):
     try:
@@ -85,4 +87,32 @@ async def generate_code_image(code_text: str, theme: str = "monokai"):
 
     except Exception as e:
         print(f"⚠️ [CRITICAL PYGMENTS ERROR]: {e}")
+        return None
+
+async def generate_math_image(latex_text: str):
+    """Renders formal mathematical equations using the CodeCogs API."""
+    try:
+        print("🧮 [MATH RENDERER] Processing formula...")
+        
+        # Combine the styling tags and the math formula into one string
+        full_latex_query = r"\dpi{300}\bg_white\huge " + latex_text.strip()
+        
+        # URL encode the ENTIRE string safely, using the newer .image endpoint
+        safe_query = urllib.parse.quote(full_latex_query)
+        url = f"https://latex.codecogs.com/png.image?{safe_query}"
+        
+        async with httpx.AsyncClient(timeout=15.0) as client:
+            response = await client.get(url)
+        
+        if response.status_code == 200:
+            print("✅ [SUCCESS] Math Canvas painted!")
+            img_buffer = io.BytesIO(response.content)
+            img_buffer.name = "math.png"
+            return img_buffer
+        else:
+            print(f"❌ [API ERROR] Math Renderer returned {response.status_code}")
+            return None
+            
+    except Exception as e:
+        print(f"⚠️ [CRITICAL MATH ERROR]: {e}")
         return None
