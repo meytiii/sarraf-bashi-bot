@@ -8,7 +8,7 @@ import urllib.request
 import urllib.parse
 import httpx
 from PIL import Image, ImageDraw, ImageFont
-
+from playwright.async_api import async_playwright
 
 async def generate_code_image(code_text: str, theme: str = "monokai", watermark: str = None):
     try:
@@ -155,3 +155,33 @@ async def detect_code_language(code_text: str):
             return val[0], val[1]
 
     return "text", f"💻 {lexer.name}"
+
+
+async def generate_web_snapshot(html_text: str):
+    try:
+        print("🌐 [WEB RENDERER] Booting headless engine...")
+        async with async_playwright() as p:
+            browser = await p.chromium.launch(
+                headless=True,
+                args=[
+                    '--no-sandbox', 
+                    '--disable-dev-shm-usage', 
+                    '--disable-gpu',
+                    '--single-process'
+                ]
+            )
+            page = await browser.new_page()
+            await page.set_content(html_text)
+            
+            await page.wait_for_timeout(500) 
+            
+            screenshot_bytes = await page.screenshot(full_page=True)
+            await browser.close()
+            
+            import io
+            img_buffer = io.BytesIO(screenshot_bytes)
+            img_buffer.name = "preview.png"
+            return img_buffer
+    except Exception as e:
+        print(f"⚠️ [CRITICAL PLAYWRIGHT ERROR]: {e}")
+        return None

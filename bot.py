@@ -27,6 +27,7 @@ TEXTS = {
         "btn_math": "🧮 Math / LaTeX",
         "btn_gist": "🚀 Push to Gist",
         "btn_explain": "🧠 Explain Code",
+        "btn_preview": "🌐 Web Preview",
         "expired": "❌ Snippet expired from memory. Please send the code again.",
         "painting": "🖌️ *Painting your canvas... Please wait.*",
         "executing": "⚙️ *Executing your code in the cloud...*",
@@ -54,6 +55,7 @@ TEXTS = {
         "btn_math": "🧮 فرمول ریاضی",
         "btn_gist": "🚀 ارسال به Gist",
         "btn_explain": "🧠 توضیح کد",
+        "btn_preview": "🌐 پیش‌نمایش وب",
         "expired": "❌ داده‌ها از حافظه پاک شده‌اند. لطفاً دوباره ارسال کنید.",
         "painting": "🖌️ *در حال ساخت تصویر... لطفاً صبر کنید.*",
         "executing": "⚙️ *در حال اجرای کد شما در فضای ابری...*",
@@ -157,6 +159,9 @@ async def handle_code_message(update: Update, context: ContextTypes.DEFAULT_TYPE
         [
             InlineKeyboardButton(get_text(context, "btn_gist"), callback_data="push_gist"),
             InlineKeyboardButton(get_text(context, "btn_explain"), callback_data="explain_code")
+        ],
+        [
+            InlineKeyboardButton(get_text(context, "btn_preview"), callback_data="preview_web")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -273,6 +278,20 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             
         except Exception as e:
             print(f"Gemini API Error: {e}")
+            await query.edit_message_text(get_text(context, "sys_err"))
+
+    elif query.data == "preview_web":
+        await query.edit_message_text("🌐 *Rendering webpage preview...*", parse_mode="Markdown")
+        try:
+            from renderer import generate_web_snapshot
+            image_buffer = await generate_web_snapshot(code_content)
+            if image_buffer:
+                await context.bot.send_photo(chat_id=query.message.chat_id, photo=image_buffer)
+                await query.message.delete()
+            else:
+                await query.edit_message_text(get_text(context, "fail_render"))
+        except Exception as e:
+            print(f"Error: {e}")
             await query.edit_message_text(get_text(context, "sys_err"))
 
     elif query.data == "push_gist":
