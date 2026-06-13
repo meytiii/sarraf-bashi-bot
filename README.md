@@ -1,53 +1,55 @@
-# 🎨 Code Picasso (@CodePicasso_bot)
+content = """# 💰 صراف‌باشی | Sarraf-Bashi Telegram Bot
 
-`Code Picasso` is an automated, zero-cost Telegram bot that transforms ugly, raw code blocks shared in chats into beautifully syntax-highlighted carbon-copy images. It operates completely locally without external paid APIs, making it highly efficient and lightweight.
+یک ربات تلگرام کاملاً رایگان، سبک و بهینه برای استعلام لحظه‌ای قیمت ارز و طلا در بازار ایران به ریال. این ربات برای اجرا در سرورهای ضعیف (حتی با ۵۱۲ مگابایت رم) بهینه‌سازی شده است.
 
----
-
-## ✨ Features
-* **Zero API Costs:** Runs completely locally using native Python engines.
-* **Smart Auto-Detection:** Automatically infers the programming language of incoming snippets.
-* **Beautiful Presentations:** Renders code blocks inside an elegant dark-mode canvas with clean shadow profiling.
-* **Mobile Friendly:** Converts low-readability mono text blocks into crisp images optimized for small screens.
+A lightweight, completely free Telegram bot built with Python (`aiogram`) to track live USD, EUR, 18k Gold, and Silver prices in Iranian Rials (IRR). Highly optimized for low-resource environments (e.g., 512 MB RAM).
 
 ---
 
-## 🛠️ Built With
-* [Python 3.10+](https://www.python.org/)
-* [python-telegram-bot](https://github.com/python-telegram-bot/python-telegram-bot) - Bot API framework
-* [Pygments](https://pygments.org/) - Code syntax compiler
-* [Playwright](https://playwright.dev/python/) - Headless browser engine for image snapshots
+## ✨ ویژگی‌ها | Features
+
+* 💵 **قیمت ارزها:** دلار آمریکا (USD) و یورو (EUR) به ریال.
+* 🥇 **قیمت فلزات گرانبها:** طلای ۱۸ عیار (هر گرم) و نقره به ریال.
+* ⚡ **سرعت بالا و کم‌مصرف:** مصرف رم بسیار پایین (کمتر از ۵۰ مگابایت)، مناسب برای هاست‌های رایگان.
+* 🔄 **بدون نیاز به کلید API:** استفاده از وب‌سرویس عمومی و بدون تحریم `brsapi.ir`.
 
 ---
 
-## 🚀 Local Installation & Setup
+## 🛠️ نیازمندی‌ها | Prerequisites
 
-1. **Clone the repository:**
+- Python 3.9+
+- Python Libraries: `aiogram`, `aiohttp`
+
+---
+
+## 🚀 راه‌اندازی سریع | Quick Start
+
+1. **کلون کردن مخزن | Clone the repository:**
    ```bash
-   git clone [https://github.com/acantgemini-oss/codepicasso_tgbot.git](https://github.com/acantgemini-oss/codepicasso_tgbot.git)
-   cd codepicasso_tgbot
+   git clone [https://github.com/meytiii/sarraf-bashi-bot.git](https://github.com/meytiii/sarraf-bashi-bot.git)
+   cd sarraf-bashi-bot
 
+```
 
-
-2. **Install requirements & browser binaries:**
+2. **نصب کتابخانه‌ها | Install dependencies:**
 ```bash
 pip install -r requirements.txt
-playwright install chromium
 
 ```
 
 
-3. **Set your Environment Token:**
-Create an environment variable or place your token directly into your runtime configuration:
-```bash
-export TELEGRAM_BOT_TOKEN="your_token_here"
+3. **تنظیم توکن ربات | Configure Bot Token:**
+یک فایل به نام `.env` در پوشه اصلی بسازید و توکن خود را در آن قرار دهید:
+Create a `.env` file in the root directory:
+```env
+BOT_TOKEN=your_telegram_bot_token_here
 
 ```
 
 
-4. **Run the bot:**
+4. **اجرای ربات | Run the bot:**
 ```bash
-python bot.py
+python main.py
 
 ```
 
@@ -55,29 +57,8 @@ python bot.py
 
 ---
 
-## 📦 Cloud Deployment Guide
+## 📄 لایسنس | License
 
-When deploying to automated container-building hosting services (like your build platform):
-
-1. Link your GitHub repository `acantgemini-oss/codepicasso_tgbot` to the provider.
-2. Set the **Build Command** to ensure your headless engine dependencies are pulled down successfully:
-```bash
-pip install -r requirements.txt && playwright install chromium
-
-```
-
-
-3. Set the **Start/Runtime Command**:
-```bash
-python bot.py
-
-```
-
-
-4. Add your `TELEGRAM_BOT_TOKEN` under the platform's **Environment Variables / Config Vars** section.
-
----
-
-👨‍💻 Maintained by [@acantgemini-oss](https://github.com/acantgemini-oss) | Try it out on Telegram: [@CodePicasso_bot](https://www.google.com/search?q=https://t.me/CodePicasso_bot)
-
-```
+این پروژه تحت لایسنس **MIT** منتشر شده است. استفاده و تغییر در آن کاملاً آزاد و رایگان است.
+Distributed under the **MIT License**. See `LICENSE` for more information.
+"""
