@@ -65,13 +65,13 @@ async def command_price_handler(message: types.Message) -> None:
     
     if data:
         result_text = (
-            "قیمت‌های لحظه‌ای بازار:\n\n"
-            f"دلار آمریکا: {data['usd']}\n"
-            f"یورو: {data['eur']}\n"
-            f"پوند انگلیس: {data['gbp']}\n"
-            f"طلای 18 عیار: {data['gold_18k']}\n"
-            f"انس نقره: {data['silver_ounce']}\n\n"
-            "به‌روزرسانی شده از سرور صراف‌باشی"
+            "📊 قیمت‌های لحظه‌ای بازار:\n\n"
+            f"🇺🇸 دلار آمریکا: {data['usd']}\n"
+            f"🇪🇺 یورو: {data['eur']}\n"
+            f"🇬🇧 پوند انگلیس: {data['gbp']}\n"
+            f"🥇 طلای 18 عیار: {data['gold_18k']}\n"
+            f"🥈 انس نقره: {data['silver_ounce']}\n\n"
+            "⏱ به‌روزرسانی شده از سرور صراف‌باشی"
         )
     else:
         result_text = "متاسفانه در ارتباط با سرور قیمت‌ها مشکلی پیش آمد. لطفا دقایقی دیگر دوباره تلاش کنید."
