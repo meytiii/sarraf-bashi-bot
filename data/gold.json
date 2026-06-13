@@ -1,0 +1,97 @@
+{
+  "xau": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 762172900,
+    "date": 1781335812
+  },
+  "usd_xau": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": "4210.9",
+    "date": 1781335812
+  },
+  "bub_sekkeh": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": -1395060,
+    "date": 1781335812
+  },
+  "bub_bahar": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": -7365060,
+    "date": 1781335812
+  },
+  "bub_nim": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 2298500,
+    "date": 1781335812
+  },
+  "bub_rob": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 6134250,
+    "date": 1781335812
+  },
+  "bub_18ayar": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": -540930,
+    "date": 1781335812
+  },
+  "bub_gerami": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 4916020,
+    "date": 1781335812
+  },
+  "sekkeh": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 178000000,
+    "date": 1781335812
+  },
+  "bahar": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 172000000,
+    "date": 1781335812
+  },
+  "nim": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 92000000,
+    "date": 1781335812
+  },
+  "rob": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 51000000,
+    "date": 1781335812
+  },
+  "18ayar": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 17837390,
+    "date": 1781335812
+  },
+  "abshodeh": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 77268000,
+    "date": 1781335812
+  },
+  "gerami": {
+    "change_val": 0,
+    "change_pct": 0,
+    "value": 27000000,
+    "date": 1781335812
+  },
+  "bub_abshodeh": {
+    "change_val": 0,
+    "change_pct": 0,
+    "date": 1781335812
+  }
+}
