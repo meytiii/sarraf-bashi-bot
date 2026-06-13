@@ -6,6 +6,7 @@ env/
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*.zip
 
 # OS generated files
 .DS_Store
