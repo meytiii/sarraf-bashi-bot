@@ -26,16 +26,21 @@ TEXTS = {
         "btn_run": "▶️ Run Code (Live)",
         "btn_math": "🧮 Math / LaTeX",
         "btn_gist": "🚀 Push to Gist",
+        "btn_explain": "🧠 Explain Code",
         "expired": "❌ Snippet expired from memory. Please send the code again.",
         "painting": "🖌️ *Painting your canvas... Please wait.*",
         "executing": "⚙️ *Executing your code in the cloud...*",
+        "explaining": "🧠 *Analyzing code structure...*",
         "gist_creating": "🚀 *Pushing your code to GitHub Gist...*",
         "gist_success": "✅ *Gist created successfully!*\n🔗 [View on GitHub]({})",
         "gist_fail": "❌ Failed to create Gist on GitHub. Verify your GITHUB_TOKEN.",
         "fail_render": "❌ Failed to render canvas cleanly.",
         "sys_err": "⚠️ A system framework rendering issue occurred.",
         "exec_reject": "❌ Execution engine rejected the request.",
-        "net_err": "⚠️ A network error occurred while reaching the execution engine."
+        "net_err": "⚠️ A network error occurred while reaching the execution engine.",
+        "wm_help": "✍️ *Set your watermark!*\nSend `/watermark <your text>` to add a signature to your images.\nExample: `/watermark @meytiii`",
+        "wm_set": "✅ Watermark set to: *{}*",
+        "wm_clear": "✅ Watermark removed."
     },
     "fa": {
         "welcome": "🎨 *به Code Picasso خوش آمدید!*\n\nمن کدهای خام شما را به تصاویر زیبا و خوانا تبدیل می‌کنم.\n\n📥 *نحوه استفاده:*\nکافیست کد خود را مستقیماً در این چت ارسال یا فوروارد کنید.",
@@ -48,16 +53,21 @@ TEXTS = {
         "btn_run": "▶️ اجرای زنده کد",
         "btn_math": "🧮 فرمول ریاضی",
         "btn_gist": "🚀 ارسال به Gist",
+        "btn_explain": "🧠 توضیح کد",
         "expired": "❌ داده‌ها از حافظه پاک شده‌اند. لطفاً دوباره ارسال کنید.",
         "painting": "🖌️ *در حال ساخت تصویر... لطفاً صبر کنید.*",
         "executing": "⚙️ *در حال اجرای کد شما در فضای ابری...*",
+        "explaining": "🧠 *در حال تحلیل ساختار کد...*",
         "gist_creating": "🚀 *در حال ارسال کد به GitHub Gist...*",
         "gist_success": "✅ *Gist با موفقیت ساخته شد!*\n🔗 [مشاهده در گیت‌هاب]({})",
         "gist_fail": "❌ ساخت Gist با خطا مواجه شد. تنظیمات GITHUB_TOKEN را بررسی کنید.",
         "fail_render": "❌ ساخت تصویر با خطا مواجه شد.",
         "sys_err": "⚠️ خطای سیستمی رخ داد.",
         "exec_reject": "❌ موتور اجرا درخواست را رد کرد.",
-        "net_err": "⚠️ خطای شبکه در ارتباط با موتور اجرا."
+        "net_err": "⚠️ خطای شبکه در ارتباط با موتور اجرا.",
+        "wm_help": "✍️ *تنظیم واترمارک!*\nبرای افزودن امضا به تصاویر، از دستور `/watermark <متن>` استفاده کنید.\nمثال: `/watermark @meytiii`",
+        "wm_set": "✅ واترمارک تنظیم شد: *{}*",
+        "wm_clear": "✅ واترمارک حذف شد."
     }
 }
 
@@ -103,6 +113,23 @@ async def theme_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(get_text(context, "theme_prompt"), reply_markup=reply_markup, parse_mode="Markdown")
 
+async def watermark_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if 'language' not in context.user_data:
+        context.user_data['language'] = 'en'
+        
+    if not context.args:
+        await update.message.reply_text(get_text(context, "wm_help"), parse_mode="Markdown")
+        return
+        
+    wm_text = " ".join(context.args)
+    if wm_text.lower() in ["off", "none", "clear", "حذف"]:
+        context.user_data.pop('watermark', None)
+        await update.message.reply_text(get_text(context, "wm_clear"))
+    else:
+        context.user_data['watermark'] = wm_text
+        safe_text = html.escape(wm_text)
+        await update.message.reply_text(get_text(context, "wm_set").format(safe_text), parse_mode="HTML")
+
 async def handle_code_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     code_content = update.message.text or update.message.caption
     if not code_content:
@@ -128,7 +155,8 @@ async def handle_code_message(update: Update, context: ContextTypes.DEFAULT_TYPE
             InlineKeyboardButton(get_text(context, "btn_math"), callback_data="render_math")
         ],
         [
-            InlineKeyboardButton(get_text(context, "btn_gist"), callback_data="push_gist")
+            InlineKeyboardButton(get_text(context, "btn_gist"), callback_data="push_gist"),
+            InlineKeyboardButton(get_text(context, "btn_explain"), callback_data="explain_code")
         ]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -161,8 +189,9 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if query.data == "render_image":
         await query.edit_message_text(get_text(context, "painting"), parse_mode="Markdown")
         user_theme = context.user_data.get('theme', 'monokai')
+        user_wm = context.user_data.get('watermark')
         try:
-            image_buffer = await generate_code_image(code_content, theme=user_theme)
+            image_buffer = await generate_code_image(code_content, theme=user_theme, watermark=user_wm)
             if image_buffer:
                 await context.bot.send_photo(chat_id=query.message.chat_id, photo=image_buffer)
                 await query.message.delete()
@@ -218,6 +247,34 @@ async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             print(f"Execution Error: {e}")
             await query.edit_message_text(get_text(context, "net_err"))
 
+    elif query.data == "explain_code":
+        await query.edit_message_text(get_text(context, "explaining"), parse_mode="Markdown")
+        
+        gemini_key = os.getenv("GEMINI_API_KEY")
+        if not gemini_key:
+            await query.edit_message_text("⚠️ GEMINI_API_KEY environment variable is missing on the server.")
+            return
+            
+        try:
+            import google.generativeai as genai
+            genai.configure(api_key=gemini_key)
+            
+            model = genai.GenerativeModel('gemini-1.5-flash')
+            
+            user_lang = context.user_data.get('language', 'en')
+            lang_instruction = "Persian (فارسی)" if user_lang == 'fa' else "English"
+            
+            prompt = f"Explain the following code block clearly and concisely. Keep your explanation under 3 paragraphs. Respond exclusively in {lang_instruction}.\n\nCode:\n{code_content}"
+            
+            response = model.generate_content(prompt)
+            safe_explanation = html.escape(response.text[:3900])
+            
+            await query.edit_message_text(f"<b>🧠 AI Explanation:</b>\n\n{safe_explanation}", parse_mode="HTML")
+            
+        except Exception as e:
+            print(f"Gemini API Error: {e}")
+            await query.edit_message_text(get_text(context, "sys_err"))
+
     elif query.data == "push_gist":
         await query.edit_message_text(get_text(context, "gist_creating"), parse_mode="Markdown")
         
@@ -265,6 +322,7 @@ async def main_async():
     app.add_handler(CommandHandler("help", help_command))
     app.add_handler(CommandHandler("theme", theme_command))
     app.add_handler(CommandHandler("language", language_command))
+    app.add_handler(CommandHandler("watermark", watermark_command))
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_code_message))
     app.add_handler(CallbackQueryHandler(button_callback))
     

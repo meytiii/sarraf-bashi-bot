@@ -7,8 +7,10 @@ import os
 import urllib.request
 import urllib.parse
 import httpx
+from PIL import Image, ImageDraw, ImageFont
 
-async def generate_code_image(code_text: str, theme: str = "monokai"):
+
+async def generate_code_image(code_text: str, theme: str = "monokai", watermark: str = None):
     try:
         print(f"🎨 [LIGHTWEIGHT RENDERER] Processing snippet... (Theme: {theme})")
         
@@ -51,13 +53,11 @@ async def generate_code_image(code_text: str, theme: str = "monokai"):
 
         image_bytes = highlight(code_text, lexer, formatter)
         
-        from PIL import Image, ImageDraw
-        
         raw_img = Image.open(io.BytesIO(image_bytes))
         
         top_bar_height = 45
         padding_x = 10
-        padding_y_bottom = 10
+        padding_y_bottom = 40 if watermark else 10
         new_width = raw_img.width + (padding_x * 2)
         new_height = raw_img.height + top_bar_height + padding_y_bottom
         
@@ -76,6 +76,18 @@ async def generate_code_image(code_text: str, theme: str = "monokai"):
         draw.ellipse([(dot_x + gap*2, dot_y - dot_radius), (dot_x + gap*2 + dot_radius*2, dot_y + dot_radius)], fill="#27c93f")
         
         canvas.paste(raw_img, (padding_x, top_bar_height))
+        
+        if watermark:
+            try:
+                wm_font = ImageFont.truetype(font_path, 16)
+            except:
+                wm_font = ImageFont.load_default()
+            
+            bbox = draw.textbbox((0, 0), watermark, font=wm_font)
+            text_w = bbox[2] - bbox[0]
+            text_x = new_width - text_w - 20
+            text_y = new_height - 30
+            draw.text((text_x, text_y), watermark, fill="#888888", font=wm_font)
         
         print("✅ [SUCCESS] Canvas painted with Mac UI in pure Python memory!")
         
