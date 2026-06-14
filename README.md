@@ -13,41 +13,38 @@
 
 ---
 
-## 🛠️ نیازمندی‌ها | Prerequisites
+## 🛠️ نیازمندی‌ها
 
 - Python 3.9+
 - Python Libraries: `aiogram`, `aiohttp`
 
 ---
 
-## 🚀 راه‌اندازی سریع | Quick Start
-
-1. **کلون کردن مخزن | Clone the repository:**
+## 🚀 راه‌اندازی سریع
+1. **کلون کردن مخزن**
    ```bash
    git clone [https://github.com/meytiii/sarraf-bashi-bot.git](https://github.com/meytiii/sarraf-bashi-bot.git)
    cd sarraf-bashi-bot
 
 
 
-2. **نصب کتابخانه‌ها | Install dependencies:**
+2. **نصب کتابخانه‌ها**
 ```bash
 pip install -r requirements.txt
 
 ```
 
 
-3. **تنظیم توکن ربات | Configure Bot Token:**
+3. **تنظیم توکن ربات**
 یک فایل به نام `.env` در پوشه اصلی بسازید و توکن خود را در آن قرار دهید:
-Create a `.env` file in the root directory:
 ```env
 BOT_TOKEN=your_telegram_bot_token_here
 
 ```
 
 
-4. **اجرای ربات | Run the bot:**
+4. **اجرای ربات**
 ```bash
 python main.py
 
 ```
-
