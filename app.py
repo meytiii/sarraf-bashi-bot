@@ -7,7 +7,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 
-# Updated paths to save in a local 'data' folder
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 FIAT_PATH = os.path.join(DATA_DIR, 'fiat.json')
 GOLD_PATH = os.path.join(DATA_DIR, 'gold.json')
