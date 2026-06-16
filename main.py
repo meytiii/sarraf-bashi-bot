@@ -14,24 +14,17 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
-# --- Keyboard Generator ---
 def get_main_keyboard():
     buttons = [
         [InlineKeyboardButton(text="🔄 دریافت قیمت‌های لحظه‌ای", callback_data="fetch_prices")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
 
-# --- Handlers ---
 @dp.message(CommandStart())
 async def command_start_handler(message: types.Message) -> None:
     welcome_text = (
         "سلام! من «صراف‌باشی» هستم؛ دستیار سریع و رایگان شما برای چک کردن بازار. 💸\n\n"
-        "اینجا می‌تونی در کسری از ثانیه قیمت لحظه‌ای این موارد رو به ریال / دلار ببینی:\n"
-        "🇺🇸 دلار آمریکا\n"
-        "🇪🇺 یورو\n"
-        "🇬🇧 پوند انگلیس\n"
-        "🥇 طلای ۱۸ عیار\n"
-        "🥈 انس نقره\n\n"
+        "اینجا می‌تونی در کسری از ثانیه قیمت لحظه‌ای ارزها و سکه‌های طلا رو ببینی.\n\n"
         "برای دریافت آخرین قیمت‌ها، روی دکمه زیر کلیک کنید 👇"
     )
     await message.answer(welcome_text, reply_markup=get_main_keyboard())
@@ -44,13 +37,19 @@ async def handle_fetch_prices(callback: CallbackQuery):
     
     if data:
         result_text = (
-            "📊 قیمت‌های لحظه‌ای بازار:\n\n"
-            f"🇺🇸 دلار آمریکا: {data['usd']}\n"
-            f"🇪🇺 یورو: {data['eur']}\n"
-            f"🇬🇧 پوند انگلیس: {data['gbp']}\n"
-            f"🥇 طلای 18 عیار: {data['gold_18k']}\n"
-            f"🥈 انس نقره: {data['silver_ounce']}\n\n"
-            "⏱ به‌روزرسانی شده از سرور صراف‌باشی"
+            "قیمت‌های لحظه‌ای بازار:\n\n"
+            f"دلار آمریکا: {data['usd']}\n"
+            f"یورو: {data['eur']}\n"
+            f"پوند انگلیس: {data['gbp']}\n"
+            f"لیر ترکیه: {data['try']}\n"
+            f"دینار عراق: {data['iqd']}\n\n"
+            f"طلای 18 عیار: {data['gold_18k']}\n"
+            f"سکه امامی: {data['coin_emami']}\n"
+            f"نیم سکه: {data['coin_half']}\n"
+            f"ربع سکه: {data['coin_quarter']}\n"
+            f"سکه بهار آزادی: {data['coin_bahar']}\n"
+            f"انس نقره: {data['silver_ounce']}\n\n"
+            "بهروزرسانی شده از سرور صراف‌باشی"
         )
     else:
         result_text = "❌ متاسفانه در ارتباط با سرور قیمت‌ها مشکلی پیش آمد. لطفا دقایقی دیگر دوباره تلاش کنید."
@@ -65,20 +64,25 @@ async def command_price_handler(message: types.Message) -> None:
     
     if data:
         result_text = (
-            "📊 قیمت‌های لحظه‌ای بازار:\n\n"
-            f"🇺🇸 دلار آمریکا: {data['usd']}\n"
-            f"🇪🇺 یورو: {data['eur']}\n"
-            f"🇬🇧 پوند انگلیس: {data['gbp']}\n"
-            f"🥇 طلای 18 عیار: {data['gold_18k']}\n"
-            f"🥈 انس نقره: {data['silver_ounce']}\n\n"
-            "⏱ به‌روزرسانی شده از سرور صراف‌باشی"
+            "قیمت‌های لحظه‌ای بازار:\n\n"
+            f"دلار آمریکا: {data['usd']}\n"
+            f"یورو: {data['eur']}\n"
+            f"پوند انگلیس: {data['gbp']}\n"
+            f"لیر ترکیه: {data['try']}\n"
+            f"دینار عراق: {data['iqd']}\n\n"
+            f"طلای 18 عیار: {data['gold_18k']}\n"
+            f"سکه امامی: {data['coin_emami']}\n"
+            f"نیم سکه: {data['coin_half']}\n"
+            f"ربع سکه: {data['coin_quarter']}\n"
+            f"سکه بهار آزادی: {data['coin_bahar']}\n"
+            f"انس نقره: {data['silver_ounce']}\n\n"
+            "بهروزرسانی شده از سرور صراف‌باشی"
         )
     else:
         result_text = "متاسفانه در ارتباط با سرور قیمت‌ها مشکلی پیش آمد. لطفا دقایقی دیگر دوباره تلاش کنید."
         
     await status_msg.edit_text(result_text, reply_markup=get_main_keyboard())
 
-# --- Startup ---
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
     print("صراف‌باشی در حال اجراست... (Bot is starting...)")
