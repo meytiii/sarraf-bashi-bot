@@ -5,16 +5,10 @@ async def get_market_data():
     DATA_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/tgju.json"
     
     results = {
-        "usd": "نامشخص",
-        "eur": "نامشخص",
-        "gbp": "نامشخص",
-        "iqd": "نامشخص",
-        "try": "نامشخص",
-        "gold_18k": "نامشخص",
-        "coin_emami": "نامشخص",
-        "coin_bahar": "نامشخص",
-        "coin_half": "نامشخص",
-        "coin_quarter": "نامشخص",
+        "usd": "نامشخص", "eur": "نامشخص", "gbp": "نامشخص",
+        "iqd": "نامشخص", "try": "نامشخص", "gold_18k": "نامشخص",
+        "coin_emami": "نامشخص", "coin_bahar": "نامشخص",
+        "coin_half": "نامشخص", "coin_quarter": "نامشخص",
         "silver_ounce": "نامشخص"
     }
 
@@ -25,30 +19,30 @@ async def get_market_data():
             async with session.get(DATA_URL) as response:
                 if response.status == 200:
                     data = await response.json(content_type=None)
-                    
                     current_data = data.get("current", data)
                     
-                    def get_price(key, unit="تومان"):
-                        try:
+                    def get_price(keys, unit="ریال"):
+                        for key in keys:
                             if key in current_data:
-                                return f"{current_data[key]['p']} {unit}"
-                            return "نامشخص"
-                        except:
-                            return "نامشخص"
+                                if 'p' in current_data[key]:
+                                    return f"{current_data[key]['p']} {unit}"
+                                elif 'v' in current_data[key]:
+                                    return f"{current_data[key]['v']} {unit}"
+                        return "نامشخص"
 
-                    results["usd"] = get_price("price_dollar_rl")
-                    results["eur"] = get_price("price_eur")
-                    results["gbp"] = get_price("price_gbp")
-                    results["iqd"] = get_price("price_iqd")
-                    results["try"] = get_price("price_try")
+                    results["usd"] = get_price(["price_dollar_rl", "dollar_rl"])
+                    results["eur"] = get_price(["price_eur", "eur"])
+                    results["gbp"] = get_price(["price_gbp", "gbp"])
+                    results["iqd"] = get_price(["price_iqd", "iqd"])
+                    results["try"] = get_price(["price_try", "try", "lira"])
                     
-                    results["gold_18k"] = get_price("gerami18")
-                    results["coin_emami"] = get_price("sekee")
-                    results["coin_bahar"] = get_price("sekkeh")
-                    results["coin_half"] = get_price("nim")
-                    results["coin_quarter"] = get_price("rob")
+                    results["gold_18k"] = get_price(["gerami18", "18ayar"])
+                    results["coin_emami"] = get_price(["sekee", "emami", "sekkeh_emami"])
+                    results["coin_bahar"] = get_price(["sekkeh", "bahar", "sekkeh_bahar"])
+                    results["coin_half"] = get_price(["nim", "nim_sekkeh"])
+                    results["coin_quarter"] = get_price(["rob", "rob_sekkeh"])
                     
-                    results["silver_ounce"] = get_price("ons_silver", "دلار")
+                    results["silver_ounce"] = get_price(["silver_999", "ons_silver", "silver"])
 
             return results
 
