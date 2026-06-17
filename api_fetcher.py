@@ -35,10 +35,9 @@ async def get_market_data():
                     results["gbp"] = get_price(["price_gbp", "gbp"])
                     results["iqd"] = get_price(["price_iqd", "iqd"])
                     results["try"] = get_price(["price_try", "try", "lira"])
-                    
-                    results["gold_18k"] = get_price(["gerami18", "18ayar"])
+                    results["gold_18k"] = get_price(["geram18", "tgju_gold_irg18", "gerami18", "price_gerami18", "gold18", "18ayar", "ayar18", "gerami", "mesghal_18"])
                     results["coin_emami"] = get_price(["sekee", "emami", "sekkeh_emami"])
-                    results["coin_bahar"] = get_price(["sekkeh", "bahar", "sekkeh_bahar"])
+                    results["coin_bahar"] = get_price(["sekeb", "sekeb_buy", "retail_sekeb", "bahar", "price_bahar", "sekkeh_bahar", "sekeh_bahar", "seke_bahar", "sekebahar", "sekkeh"])
                     results["coin_half"] = get_price(["nim", "nim_sekkeh"])
                     results["coin_quarter"] = get_price(["rob", "rob_sekkeh"])
                     
