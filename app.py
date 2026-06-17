@@ -2,7 +2,6 @@ import os
 import json
 import requests
 
-# We will save everything into a single file now!
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 TGJU_PATH = os.path.join(DATA_DIR, 'tgju.json')
 
