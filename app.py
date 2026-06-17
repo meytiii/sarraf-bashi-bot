@@ -7,7 +7,7 @@ DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
 TGJU_PATH = os.path.join(DATA_DIR, 'tgju.json')
 
 def main():
-    url = "https://call5.tgju.org/ajax.json"
+    url = "https://call3.tgju.org/ajax.json?rev=fdQuRN1kGtR9rQviUtqdaPuDpnyMsBYyjj0hMOhG3CD3amFqrGmp6EHB9TWs"
     
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
