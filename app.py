@@ -1,74 +1,37 @@
 import os
-import time
 import json
-import base64
 import requests
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.support.ui import WebDriverWait
 
+# We will save everything into a single file now!
 DATA_DIR = os.path.join(os.path.dirname(__file__), 'data')
-FIAT_PATH = os.path.join(DATA_DIR, 'fiat.json')
-GOLD_PATH = os.path.join(DATA_DIR, 'gold.json')
-
-def get_driver():
-    options = Options()
-    options.add_argument("--headless")
-    options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
-    return webdriver.Chrome(options=options)
-
-def get_phpsessid(driver, url):
-    driver.get(url)
-    WebDriverWait(driver, 10).until(
-        lambda d: d.execute_script("return document.readyState") == "complete"
-    )
-    time.sleep(2)
-    for cookie in driver.get_cookies():
-        if cookie['name'] == 'PHPSESSID':
-            return cookie['value']
-    return None
-
-def make_request(driver, endpoint, filename, csrf_token):
-    unix_time = int(time.time())
-    url = f"https://www.navasan.net/{endpoint}?csrf={csrf_token}&_={unix_time}"
-
-    cookies = {c['name']: c['value'] for c in driver.get_cookies()}
-    headers = {
-        'User-Agent': 'Mozilla/5.0',
-        'X-Requested-With': 'XMLHttpRequest',
-        'Referer': 'https://www.navasan.net/',
-    }
-
-    response = requests.get(url, headers=headers, cookies=cookies, timeout=15)
-    if response.status_code == 200:
-        try:
-            data = response.json()
-            with open(filename, 'w', encoding='utf-8') as f:
-                json.dump(data, f, indent=2, ensure_ascii=False)
-        except json.JSONDecodeError:
-            with open(filename.replace('.json', '.txt'), 'w', encoding='utf-8') as f:
-                f.write(response.text)
+TGJU_PATH = os.path.join(DATA_DIR, 'tgju.json')
 
 def main():
-    url = "https://www.navasan.net/"
-    prefix = "2bba8a6abdcae9571d63fefcd1df29bb3a8f5d91http://www.navasan.net/54tf%f"
+    url = "https://call5.tgju.org/ajax.json"
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "application/json",
+        "Referer": "https://www.tgju.org/"
+    }
 
-    driver = get_driver()
     try:
-        phpsessid = get_phpsessid(driver, url)
-        if not phpsessid:
-            print("PHPSESSID not found.")
-            return
-        csrf_token = base64.b64encode((prefix + phpsessid).encode()).decode()
+        response = requests.get(url, headers=headers, timeout=10)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            os.makedirs(DATA_DIR, exist_ok=True)
+            
+            with open(TGJU_PATH, 'w', encoding='utf-8') as f:
+                json.dump(data, f, indent=2, ensure_ascii=False)
+                
+            print("✅ Data successfully fetched and saved to data/tgju.json!")
+        else:
+            print(f"❌ Failed to fetch data. Status Code: {response.status_code}")
 
-        os.makedirs(DATA_DIR, exist_ok=True)
-
-        make_request(driver, "last_currencies.php", FIAT_PATH, csrf_token)
-        make_request(driver, "gold_rates.php", GOLD_PATH, csrf_token)
-
-    finally:
-        driver.quit()
+    except Exception as e:
+        print(f"🚨 Error fetching data: {e}")
 
 if __name__ == "__main__":
     main()

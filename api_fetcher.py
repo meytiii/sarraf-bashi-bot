@@ -2,8 +2,7 @@ import aiohttp
 import asyncio
 
 async def get_market_data():
-    FIAT_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/fiat.json"
-    GOLD_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/gold.json"
+    DATA_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/tgju.json"
     
     results = {
         "usd": "نامشخص",
@@ -23,41 +22,43 @@ async def get_market_data():
 
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=timeout) as session:
         try:
-            async with session.get(FIAT_URL) as response:
+            async with session.get(DATA_URL) as response:
                 if response.status == 200:
-                    fiat_data = await response.json(content_type=None)
+                    data = await response.json(content_type=None)
                     
-                    if "usd" in fiat_data:
-                        results["usd"] = f"{int(fiat_data['usd']['value']):,} تومان"
-                    if "eur" in fiat_data:
-                        results["eur"] = f"{int(fiat_data['eur']['value']):,} تومان"
-                    if "gbp" in fiat_data:
-                        results["gbp"] = f"{int(fiat_data['gbp']['value']):,} تومان"
-                    if "iqd" in fiat_data:
-                        results["iqd"] = f"{int(fiat_data['iqd']['value']):,} تومان"
-                    if "try" in fiat_data:
-                        results["try"] = f"{int(fiat_data['try']['value']):,} تومان"
-                    if "xag" in fiat_data:
-                        results["silver_ounce"] = f"{int(fiat_data['xag']['value']):,} تومان"
+                    current_data = data.get("current", data)
+                    
+                    def get_price(key, unit="تومان"):
+                        try:
+                            if key in current_data:
+                                return f"{current_data[key]['p']} {unit}"
+                            return "نامشخص"
+                        except:
+                            return "نامشخص"
 
-            # 2. Fetch Gold and Coin Data
-            async with session.get(GOLD_URL) as response:
-                if response.status == 200:
-                    gold_data = await response.json(content_type=None)
+                    results["usd"] = get_price("price_dollar_rl")
+                    results["eur"] = get_price("price_eur")
+                    results["gbp"] = get_price("price_gbp")
+                    results["iqd"] = get_price("price_iqd")
+                    results["try"] = get_price("price_try")
                     
-                    if "18ayar" in gold_data:
-                        results["gold_18k"] = f"{int(gold_data['18ayar']['value']):,} تومان"
-                    if "sekkeh" in gold_data:
-                        results["coin_emami"] = f"{int(gold_data['sekkeh']['value']):,} تومان"
-                    if "bahar" in gold_data:
-                        results["coin_bahar"] = f"{int(gold_data['bahar']['value']):,} تومان"
-                    if "nim" in gold_data:
-                        results["coin_half"] = f"{int(gold_data['nim']['value']):,} تومان"
-                    if "rob" in gold_data:
-                        results["coin_quarter"] = f"{int(gold_data['rob']['value']):,} تومان"
+                    results["gold_18k"] = get_price("gerami18")
+                    results["coin_emami"] = get_price("sekee")
+                    results["coin_bahar"] = get_price("sekkeh")
+                    results["coin_half"] = get_price("nim")
+                    results["coin_quarter"] = get_price("rob")
+                    
+                    results["silver_ounce"] = get_price("ons_silver", "دلار")
 
             return results
 
         except Exception as e:
-            print(f"🚨 GitHub Fetch Error: {e}")
+            print(f"🚨 TGJU Fetch Error: {e}")
             return None
+
+if __name__ == "__main__":
+    async def test_api():
+        data = await get_market_data()
+        print(data)
+        
+    asyncio.run(test_api())
