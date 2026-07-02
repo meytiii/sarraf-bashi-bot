@@ -5,13 +5,13 @@ import re
 async def get_market_data():
     DATA_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/tgju.json"
     
-    results = {
-        "usd": "نامشخص", "eur": "نامشخص", "gbp": "نامشخص",
-        "iqd": "نامشخص", "try": "نامشخص", "gold_18k": "نامشخص",
-        "coin_emami": "نامشخص", "coin_bahar": "نامشخص",
-        "coin_half": "نامشخص", "coin_quarter": "نامشخص",
-        "silver_ounce": "نامشخص"
-    }
+    # Pre-fill default empty dictionaries
+    results = {}
+    for k in ["usd", "eur", "gbp", "iqd", "try", "gold_18k", "coin_emami", "coin_bahar", "coin_half", "coin_quarter", "silver_ounce"]:
+        results[k] = "نامشخص"
+        results[f"{k}_d"] = "0"
+        results[f"{k}_dp"] = "0"
+        results[f"{k}_dt"] = ""
 
     timeout = aiohttp.ClientTimeout(total=10)
 
@@ -22,28 +22,33 @@ async def get_market_data():
                     data = await response.json(content_type=None)
                     current_data = data.get("current", data)
                     
-                    def get_price(keys, unit="ریال"):
+                    def set_price(target_key, keys, unit="ریال"):
                         for key in keys:
                             if key in current_data:
-                                if 'p' in current_data[key]:
-                                    return f"{current_data[key]['p']} {unit}"
-                                elif 'v' in current_data[key]:
-                                    return f"{current_data[key]['v']} {unit}"
-                        return "نامشخص"
+                                item = current_data[key]
+                                if 'p' in item:
+                                    results[target_key] = f"{item['p']} {unit}"
+                                elif 'v' in item:
+                                    results[target_key] = f"{item['v']} {unit}"
+                                
+                                # Extract the change metrics
+                                results[f"{target_key}_d"] = str(item.get('d', '0'))
+                                results[f"{target_key}_dp"] = str(item.get('dp', '0'))
+                                results[f"{target_key}_dt"] = str(item.get('dt', ''))
+                                return
 
-                    results["usd"] = get_price(["price_dollar_rl", "dollar_rl"])
-                    results["eur"] = get_price(["price_eur", "eur"])
-                    results["gbp"] = get_price(["price_gbp", "gbp"])
-                    results["iqd"] = get_price(["price_iqd", "iqd"])
-                    results["try"] = get_price(["price_try", "try", "lira"])
+                    set_price("usd", ["price_dollar_rl", "dollar_rl"])
+                    set_price("eur", ["price_eur", "eur"])
+                    set_price("gbp", ["price_gbp", "gbp"])
+                    set_price("iqd", ["price_iqd", "iqd"])
+                    set_price("try", ["price_try", "try", "lira"])
                     
-                    results["gold_18k"] = get_price(["geram18", "tgju_gold_irg18", "gerami18", "price_gerami18", "gold18", "18ayar", "ayar18", "gerami", "mesghal_18"])
-                    results["coin_emami"] = get_price(["sekee", "emami", "sekkeh_emami"])
-                    results["coin_bahar"] = get_price(["sekeb", "sekeb_buy", "retail_sekeb", "bahar", "price_bahar", "sekkeh_bahar", "sekeh_bahar", "seke_bahar", "sekebahar", "sekkeh"])
-                    results["coin_half"] = get_price(["nim", "nim_sekkeh"])
-                    results["coin_quarter"] = get_price(["rob", "rob_sekkeh"])
-                    
-                    results["silver_ounce"] = get_price(["silver_999", "ons_silver", "silver"])
+                    set_price("gold_18k", ["geram18", "tgju_gold_irg18", "gerami18", "price_gerami18", "gold18", "18ayar", "ayar18", "gerami", "mesghal_18"])
+                    set_price("coin_emami", ["sekee", "emami", "sekkeh_emami"])
+                    set_price("coin_bahar", ["sekeb", "sekeb_buy", "retail_sekeb", "bahar", "price_bahar", "sekkeh_bahar", "sekeh_bahar", "seke_bahar", "sekebahar", "sekkeh"])
+                    set_price("coin_half", ["nim", "nim_sekkeh"])
+                    set_price("coin_quarter", ["rob", "rob_sekkeh"])
+                    set_price("silver_ounce", ["silver_999", "ons_silver", "silver"])
 
             return results
 
@@ -60,12 +65,7 @@ async def get_history_data():
     }
     history = {"usd": {}, "coin_emami": {}, "gold_18k": {}}
     timeout = aiohttp.ClientTimeout(total=10)
-    
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-        "Accept": "application/json",
-        "Referer": "https://www.tgju.org/"
-    }
+    headers = {"User-Agent": "Mozilla/5.0", "Accept": "application/json", "Referer": "https://www.tgju.org/"}
     
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=timeout, headers=headers) as session:
         for key, id_list in assets.items():
@@ -76,7 +76,6 @@ async def get_history_data():
                         if response.status == 200:
                             data = await response.json()
                             rows = data.get("data", [])
-                            
                             if rows:
                                 rows.reverse()
                                 for row in rows:
@@ -85,7 +84,6 @@ async def get_history_data():
                                         price_str = re.sub(r'[^\d.]', '', row[3])
                                         if price_str:
                                             history[key][date_str] = float(price_str)
-                                
                                 break 
                 except Exception as e:
                     print(f"🚨 History API Fetch Error ({key} -> {tgju_id}): {e}")
