@@ -125,7 +125,7 @@ async def group_usd_listener(message: types.Message):
     history = await get_history_data()
     if data and data['usd'] != "نامشخص":
         photo_bytes = generate_price_banner("usd", "قیمت دلار آمریکا", data['usd'], history)
-        input_file = BufferedInputFile(photo_bytes.read(), filename="usd.png")
+        input_file = BufferedInputFile(photo_bytes.getvalue(), filename="usd.png")
         
         caption = format_caption("1 دلار آمریکا", data['usd'], data['usd'])
         bot_me = await bot.get_me()
@@ -139,7 +139,7 @@ async def group_coin_listener(message: types.Message):
     history = await get_history_data()
     if data and data['coin_emami'] != "نامشخص":
         photo_bytes = generate_price_banner("coin", "سکه امامی", data['coin_emami'], history)
-        input_file = BufferedInputFile(photo_bytes.read(), filename="coin.png")
+        input_file = BufferedInputFile(photo_bytes.getvalue(), filename="coin.png")
         
         caption = format_caption("سکه امامی", data['coin_emami'], data['usd'])
         bot_me = await bot.get_me()
@@ -153,7 +153,7 @@ async def group_gold_listener(message: types.Message):
     history = await get_history_data()
     if data and data['gold_18k'] != "نامشخص":
         photo_bytes = generate_price_banner("gold", "طلای 18 عیار (هر گرم)", data['gold_18k'], history)
-        input_file = BufferedInputFile(photo_bytes.read(), filename="gold.png")
+        input_file = BufferedInputFile(photo_bytes.getvalue(), filename="gold.png")
         
         caption = format_caption("1 گرم طلا 18 عیار", data['gold_18k'], data['usd'])
         bot_me = await bot.get_me()
