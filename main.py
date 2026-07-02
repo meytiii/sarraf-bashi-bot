@@ -59,9 +59,10 @@ async def command_start_handler(message: types.Message) -> None:
     welcome_text = (
         "سلام! من «صراف‌باشی» هستم؛ دستیار سریع و رایگان شما برای چک کردن بازار. 💸\n\n"
         "اینجا می‌تونی در کسری از ثانیه قیمت لحظه‌ای ارزها و سکه‌های طلا رو ببینی.\n\n"
-        "برای دریافت آخرین قیمت‌ها، روی دکمه زیر کلیک کنید 👇"
+        "برای دریافت آخرین قیمت‌ها می‌تونی از دستور /price استفاده کنی یا من رو به گروهت اضافه کنی 👇"
     )
-    await message.answer(welcome_text, reply_markup=get_main_keyboard())
+    bot_me = await bot.get_me()
+    await message.answer(welcome_text, reply_markup=get_add_to_group_keyboard(bot_me.username))
 
 @dp.callback_query(F.data == "fetch_prices")
 async def handle_fetch_prices(callback: CallbackQuery):
@@ -88,7 +89,8 @@ async def handle_fetch_prices(callback: CallbackQuery):
     else:
         result_text = "❌ متاسفانه در ارتباط با سرور قیمت‌ها مشکلی پیش آمد. لطفا دقایقی دیگر دوباره تلاش کنید."
         
-    await callback.message.edit_text(result_text, reply_markup=get_main_keyboard())
+    bot_me = await bot.get_me()
+    await callback.message.edit_text(result_text, reply_markup=get_add_to_group_keyboard(bot_me.username))
 
 @dp.message(Command("price", "gheymat"))
 async def command_price_handler(message: types.Message) -> None:
@@ -115,9 +117,10 @@ async def command_price_handler(message: types.Message) -> None:
     else:
         result_text = "متاسفانه در ارتباط با سرور قیمت‌ها مشکلی پیش آمد. لطفا دقایقی دیگر دوباره تلاش کنید."
         
-    await status_msg.edit_text(result_text, reply_markup=get_main_keyboard())
+    bot_me = await bot.get_me()
+    await status_msg.edit_text(result_text, reply_markup=get_add_to_group_keyboard(bot_me.username))
 
-# --- Phase 3: Natural Text Word Listeners ---
+# --- Natural Text Word Listeners ---
 
 @dp.message(F.text.contains("دلار"))
 async def group_usd_listener(message: types.Message):
