@@ -50,16 +50,43 @@ async def get_market_data():
             return None
 
 async def get_history_data():
-    HISTORY_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/history.json"
+    assets = {
+        "usd": "price_dollar_rl",
+        "coin_emami": "sekee",
+        "gold_18k": "geram18"
+    }
+    history = {"usd": {}, "coin_emami": {}, "gold_18k": {}}
     timeout = aiohttp.ClientTimeout(total=10)
-    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=timeout) as session:
-        try:
-            async with session.get(HISTORY_URL) as response:
-                if response.status == 200:
-                    return await response.json(content_type=None)
-        except Exception as e:
-            print(f"🚨 History Fetch Error: {e}")
-    return None
+    
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        "Accept": "application/json",
+        "Referer": "https://www.tgju.org/"
+    }
+    
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=timeout, headers=headers) as session:
+        for key, tgju_id in assets.items():
+            url = f"https://api.tgju.org/v1/market/indicator/summary-table-data/{tgju_id}?start=0&length=7"
+            try:
+                async with session.get(url) as response:
+                    if response.status == 200:
+                        data = await response.json()
+                        rows = data.get("data", [])
+                        
+                        rows.reverse()
+                        
+                        for row in rows:
+                            if len(row) >= 7:
+                                date_str = row[6].replace("/", "-") 
+                                price_str = row[3].replace(",", "")
+                                try:
+                                    history[key][date_str] = float(price_str)
+                                except ValueError:
+                                    continue
+            except Exception as e:
+                print(f"🚨 History API Fetch Error ({key}): {e}")
+                
+    return history
 
 if __name__ == "__main__":
     async def test_api():
