@@ -49,6 +49,18 @@ async def get_market_data():
             print(f"🚨 TGJU Fetch Error: {e}")
             return None
 
+async def get_history_data():
+    HISTORY_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/history.json"
+    timeout = aiohttp.ClientTimeout(total=10)
+    async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=timeout) as session:
+        try:
+            async with session.get(HISTORY_URL) as response:
+                if response.status == 200:
+                    return await response.json(content_type=None)
+        except Exception as e:
+            print(f"🚨 History Fetch Error: {e}")
+    return None
+
 if __name__ == "__main__":
     async def test_api():
         data = await get_market_data()

@@ -9,7 +9,7 @@ from aiogram.filters import CommandStart, Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, BufferedInputFile
 from dotenv import load_dotenv
 
-from api_fetcher import get_market_data
+from api_fetcher import get_market_data, get_history_data
 from image_generator import generate_price_banner
 
 load_dotenv()
@@ -122,8 +122,44 @@ async def command_price_handler(message: types.Message) -> None:
 @dp.message(F.text.contains("دلار"))
 async def group_usd_listener(message: types.Message):
     data = await get_market_data()
+    history = await get_history_data()
     if data and data['usd'] != "نامشخص":
-        photo_bytes = generate_price_banner("usd", "قیمت دلار آمریکا", data['usd'])
+        photo_bytes = generate_price_banner("usd", "قیمت دلار آمریکا", data['usd'], history)
+        input_file = BufferedInputFile(photo_bytes.read(), filename="usd.png")
+        
+        caption = format_caption("1 دلار آمریکا", data['usd'], data['usd'])
+        bot_me = await bot.get_me()
+        keyboard = get_add_to_group_keyboard(bot_me.username)
+        
+        await message.reply_photo(photo=input_file, caption=caption, reply_markup=keyboard)
+
+@dp.message(F.text.contains("سکه"))
+async def group_coin_listener(message: types.Message):
+    data = await get_market_data()
+    history = await get_history_data()
+    if data and data['coin_emami'] != "نامشخص":
+        photo_bytes = generate_price_banner("coin", "سکه امامی", data['coin_emami'], history)
+        input_file = BufferedInputFile(photo_bytes.read(), filename="coin.png")
+        
+        caption = format_caption("سکه امامی", data['coin_emami'], data['usd'])
+        bot_me = await bot.get_me()
+        keyboard = get_add_to_group_keyboard(bot_me.username)
+        
+        await message.reply_photo(photo=input_file, caption=caption, reply_markup=keyboard)
+
+@dp.message(F.text.contains("طلا"))
+async def group_gold_listener(message: types.Message):
+    data = await get_market_data()
+    history = await get_history_data()
+    if data and data['gold_18k'] != "نامشخص":
+        photo_bytes = generate_price_banner("gold", "طلای 18 عیار (هر گرم)", data['gold_18k'], history)
+        input_file = BufferedInputFile(photo_bytes.read(), filename="gold.png")
+        
+        caption = format_caption("1 گرم طلا 18 عیار", data['gold_18k'], data['usd'])
+        bot_me = await bot.get_me()
+        keyboard = get_add_to_group_keyboard(bot_me.username)
+        
+        await message.reply_photo(photo=input_file, caption=caption, reply_markup=keyboard)
         input_file = BufferedInputFile(photo_bytes.read(), filename="usd.png")
         
         caption = format_caption("1 دلار آمریکا", data['usd'], data['usd'])
