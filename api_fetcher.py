@@ -5,7 +5,6 @@ import re
 async def get_market_data():
     DATA_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/tgju.json"
     
-    # Pre-fill default empty dictionaries
     results = {}
     for k in ["usd", "eur", "gbp", "iqd", "try", "gold_18k", "coin_emami", "coin_bahar", "coin_half", "coin_quarter", "silver_ounce"]:
         results[k] = "نامشخص"
@@ -31,7 +30,6 @@ async def get_market_data():
                                 elif 'v' in item:
                                     results[target_key] = f"{item['v']} {unit}"
                                 
-                                # Extract the change metrics
                                 results[f"{target_key}_d"] = str(item.get('d', '0'))
                                 results[f"{target_key}_dp"] = str(item.get('dp', '0'))
                                 results[f"{target_key}_dt"] = str(item.get('dt', ''))
