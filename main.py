@@ -120,6 +120,24 @@ async def command_price_handler(message: types.Message) -> None:
     bot_me = await bot.get_me()
     await status_msg.edit_text(result_text, reply_markup=get_add_to_group_keyboard(bot_me.username))
 
+@dp.message(Command("help"))
+async def command_help_handler(message: types.Message) -> None:
+    help_text = (
+        "سلام رفیق! 👋 من اینجام که آمار بازار رو تو مشتت بذارم.\n\n"
+        "🛠 دستوراتی که می‌تونی استفاده کنی:\n"
+        "🔸 /start - شروع به کار و یه سلام و احوال‌پرسی کوچیک\n"
+        "🔸 /price یا /gheymat - گرفتن لیست کامل و تر و تمیز قیمت‌های لحظه‌ای\n"
+        "🔸 /help - همین راهنمایی که الان داری می‌خونی!\n\n"
+        "✨ **قابلیت خفن (ربات هوشمند):**\n"
+        "اصلاً نیازی نیست حتماً از دستور (اسلش) استفاده کنی! تو گروه یا همینجا پی‌وی، کافیه این کلمه‌ها تو متنت باشه تا من با یه بنر گرافیکی و نمودار جذاب جوابت رو بدم:\n\n"
+        "💵 بگو **دلار** -> تا قیمت لحظه‌ای دلار رو بگم\n"
+        "🪙 بگو **سکه** -> تا آمار سکه امامی رو بدم\n"
+        "🥇 بگو **طلا** -> تا قیمت یه گرم طلای ۱۸ عیار رو دربیارم\n\n"
+        "فقط کافیه این کلمات لابلای چت‌هات باشه، من خودم حواسم هست و شکارشون می‌کنم! 😎👇"
+    )
+    bot_me = await bot.get_me()
+    await message.answer(help_text, reply_markup=get_add_to_group_keyboard(bot_me.username))
+
 # --- Natural Text Word Listeners ---
 
 @dp.message(F.text.contains("دلار"))
