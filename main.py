@@ -1,12 +1,14 @@
 import asyncio
+import asyncio
 import os
 import logging
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, BufferedInputFile
 from dotenv import load_dotenv
 
 from api_fetcher import get_market_data
+from image_generator import generate_price_banner
 
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
@@ -82,6 +84,32 @@ async def command_price_handler(message: types.Message) -> None:
         result_text = "متاسفانه در ارتباط با سرور قیمت‌ها مشکلی پیش آمد. لطفا دقایقی دیگر دوباره تلاش کنید."
         
     await status_msg.edit_text(result_text, reply_markup=get_main_keyboard())
+
+# --- Natural Text Word Listeners ---
+
+@dp.message(F.text.contains("دلار"))
+async def group_usd_listener(message: types.Message):
+    data = await get_market_data()
+    if data and data['usd'] != "نامشخص":
+        photo_bytes = generate_price_banner("usd", "قیمت دلار آمریکا", data['usd'])
+        input_file = BufferedInputFile(photo_bytes.read(), filename="usd.png")
+        await message.reply_photo(photo=input_file, caption="🇺🇸 قیمت لحظه‌ای دلار آمریکا (ریال)")
+
+@dp.message(F.text.contains("سکه"))
+async def group_coin_listener(message: types.Message):
+    data = await get_market_data()
+    if data and data['coin_emami'] != "نامشخص":
+        photo_bytes = generate_price_banner("coin", "سکه امامی", data['coin_emami'])
+        input_file = BufferedInputFile(photo_bytes.read(), filename="coin.png")
+        await message.reply_photo(photo=input_file, caption="🪙 قیمت لحظه‌ای سکه امامی (ریال)")
+
+@dp.message(F.text.contains("طلا"))
+async def group_gold_listener(message: types.Message):
+    data = await get_market_data()
+    if data and data['gold_18k'] != "نامشخص":
+        photo_bytes = generate_price_banner("gold", "طلای 18 عیار (هر گرم)", data['gold_18k'])
+        input_file = BufferedInputFile(photo_bytes.read(), filename="gold.png")
+        await message.reply_photo(photo=input_file, caption="🥇 قیمت لحظه‌ای طلای ۱۸ عیار (ریال)")
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
