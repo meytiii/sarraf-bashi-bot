@@ -26,36 +26,49 @@ def generate_price_banner(banner_type, label_text, price_text):
     label_font = ImageFont.truetype(font_path, 36)
     price_font = ImageFont.truetype(font_path, 52)
     
-    raw_full_text = f"{label_text}: {price_text}"
-    reshaped_text = reshape(raw_full_text)
-    final_text_rtl = get_display(reshaped_text)
+    reshaped_label = reshape(label_text)
+    display_label = get_display(reshaped_label)
     
-    text_width = draw.textlength(final_text_rtl, font=price_font)
-    text_height = 52
+    reshaped_price = reshape(price_text)
+    display_price = get_display(reshaped_price)
     
-    x_pos = (width - text_width) / 2
-    y_pos = (height - text_height) / 2
+    label_width = draw.textlength(display_label, font=label_font)
+    label_height = 36
     
-    x_pos = (width - text_width) / 2
-    y_pos = (height - text_height) / 2 - 10
+    price_width = draw.textlength(display_price, font=price_font)
+    price_height = 52
     
-    shadow_offset = 3
-    draw.text((x_pos + shadow_offset, y_pos + shadow_offset), final_text_rtl, fill=(0, 0, 0, 180), font=price_font)
-    draw.text((x_pos, y_pos), final_text_rtl, fill=(255, 255, 255, 255), font=price_font)
+    spacing = 15
+    total_height = label_height + price_height + spacing
+    
+    start_y = (height - total_height) / 2
+    
+    card_w = max(label_width, price_width) + 100
+    card_h = total_height + 40
+    card_x1 = (width - card_w) / 2
+    card_y1 = start_y - 20
+    
+    draw.rounded_rectangle(
+        [card_x1, card_y1, card_x1 + card_w, card_y1 + card_h],
+        radius=15,
+        fill=(0, 0, 0, 110)
+    )
+
+    label_x = (width - label_width) / 2
+    draw.text((label_x, start_y), display_label, fill=(235, 235, 240, 180), font=label_font)
+    
+    price_x = (width - price_width) / 2
+    price_y = start_y + label_height + spacing
+    
+    draw.text((price_x + 2, price_y + 2), display_price, fill=(0, 0, 0, 150), font=price_font)
+    draw.text((price_x, price_y), display_price, fill=(255, 255, 255, 255), font=price_font)
     
     watermark_text = "@sarraf_bashi_bot"
     watermark_font = ImageFont.truetype(font_path, 20)
-    w_bbox = draw.textbbox((0, 0), watermark_text, font=watermark_font)
-    w_width = w_bbox[2] - w_bbox[0]
-    w_height = w_bbox[3] - w_bbox[1]
+    w_width = draw.textlength(watermark_text, font=watermark_font)
     
-    w_x = width - w_width - 25
-    w_y = height - w_height - 35
-    
-    draw.text((w_x + 1, w_y + 1), watermark_text, fill=(0, 0, 0, 100), font=watermark_font)
-    draw.text((w_x, w_y), watermark_text, fill=(255, 255, 255, 120), font=watermark_font)
-    
-    
+    draw.text((width - w_width - 35, height - 45), watermark_text, fill=(255, 255, 255, 120), font=watermark_font)
+
     byte_io = io.BytesIO()
     img.save(byte_io, 'PNG')
     byte_io.seek(0)
