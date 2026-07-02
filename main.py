@@ -119,12 +119,9 @@ async def command_price_handler(message: types.Message) -> None:
 
 # --- Phase 3: Natural Text Word Listeners ---
 
-# --- Phase 3: Natural Text Word Listeners ---
-
 @dp.message(F.text.contains("دلار"))
 async def group_usd_listener(message: types.Message):
-    data = await get_market_data()
-    history = await get_history_data()
+    data, history = await asyncio.gather(get_market_data(), get_history_data())
     if data and data['usd'] != "نامشخص":
         photo_bytes = generate_price_banner(
             "usd", "قیمت دلار آمریکا", data['usd'], 
@@ -140,8 +137,7 @@ async def group_usd_listener(message: types.Message):
 
 @dp.message(F.text.contains("سکه"))
 async def group_coin_listener(message: types.Message):
-    data = await get_market_data()
-    history = await get_history_data()
+    data, history = await asyncio.gather(get_market_data(), get_history_data())
     if data and data['coin_emami'] != "نامشخص":
         photo_bytes = generate_price_banner(
             "coin", "سکه امامی", data['coin_emami'],
@@ -157,8 +153,7 @@ async def group_coin_listener(message: types.Message):
 
 @dp.message(F.text.contains("طلا"))
 async def group_gold_listener(message: types.Message):
-    data = await get_market_data()
-    history = await get_history_data()
+    data, history = await asyncio.gather(get_market_data(), get_history_data())
     if data and data['gold_18k'] != "نامشخص":
         photo_bytes = generate_price_banner(
             "gold", "طلای 18 عیار (هر گرم)", data['gold_18k'],
