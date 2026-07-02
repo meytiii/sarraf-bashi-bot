@@ -41,6 +41,19 @@ def generate_price_banner(banner_type, label_text, price_text):
     draw.text((x_pos + shadow_offset, y_pos + shadow_offset), final_text_rtl, fill=(0, 0, 0, 180), font=price_font)
     draw.text((x_pos, y_pos), final_text_rtl, fill=(255, 255, 255, 255), font=price_font)
     
+    watermark_text = "@sarraf_bashi_bot"
+    watermark_font = ImageFont.truetype(font_path, 20)
+    w_bbox = draw.textbbox((0, 0), watermark_text, font=watermark_font)
+    w_width = w_bbox[2] - w_bbox[0]
+    w_height = w_bbox[3] - w_bbox[1]
+    
+    w_x = width - w_width - 25
+    w_y = height - w_height - 35
+    
+    draw.text((w_x + 1, w_y + 1), watermark_text, fill=(0, 0, 0, 100), font=watermark_font)
+    draw.text((w_x, w_y), watermark_text, fill=(255, 255, 255, 120), font=watermark_font)
+    
+    
     byte_io = io.BytesIO()
     img.save(byte_io, 'PNG')
     byte_io.seek(0)
