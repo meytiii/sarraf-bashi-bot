@@ -1,7 +1,9 @@
 import asyncio
-import asyncio
 import os
 import logging
+import re
+import jdatetime
+import pytz
 from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, BufferedInputFile
@@ -21,6 +23,36 @@ def get_main_keyboard():
         [InlineKeyboardButton(text="🔄 دریافت قیمت‌های لحظه‌ای", callback_data="fetch_prices")]
     ]
     return InlineKeyboardMarkup(inline_keyboard=buttons)
+
+def get_add_to_group_keyboard(bot_username: str):
+    url = f"https://t.me/{bot_username}?startgroup=true"
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="➕ افزودن به گروه", url=url)]
+    ])
+
+def format_caption(title, price_str, usd_price_str):
+    tehran_tz = pytz.timezone('Asia/Tehran')
+    now = jdatetime.datetime.now(tehran_tz).strftime("%Y/%m/%d | %H:%M:%S")
+    
+    try:
+        price_val = float(re.sub(r'[^\d.]', '', price_str))
+        usd_val = float(re.sub(r'[^\d.]', '', usd_price_str))
+        
+        toman_val = price_val / 10
+        dollar_eq = price_val / usd_val if usd_val > 0 else 0
+        
+        return (
+            f"✨ {title} :\n\n"
+            f"💸 {toman_val:,.0f} toman\n"
+            f"💵 ${dollar_eq:,.3f} dollar\n\n"
+            f"🪙 {now}"
+        )
+    except Exception as e:
+        return (
+            f"✨ {title} :\n\n"
+            f"💸 {price_str}\n\n"
+            f"🪙 {now}"
+        )
 
 @dp.message(CommandStart())
 async def command_start_handler(message: types.Message) -> None:
@@ -85,7 +117,7 @@ async def command_price_handler(message: types.Message) -> None:
         
     await status_msg.edit_text(result_text, reply_markup=get_main_keyboard())
 
-# --- Natural Text Word Listeners ---
+# --- Phase 3: Natural Text Word Listeners ---
 
 @dp.message(F.text.contains("دلار"))
 async def group_usd_listener(message: types.Message):
@@ -93,7 +125,12 @@ async def group_usd_listener(message: types.Message):
     if data and data['usd'] != "نامشخص":
         photo_bytes = generate_price_banner("usd", "قیمت دلار آمریکا", data['usd'])
         input_file = BufferedInputFile(photo_bytes.read(), filename="usd.png")
-        await message.reply_photo(photo=input_file, caption="🇺🇸 قیمت لحظه‌ای دلار آمریکا (ریال)")
+        
+        caption = format_caption("1 دلار آمریکا", data['usd'], data['usd'])
+        bot_me = await bot.get_me()
+        keyboard = get_add_to_group_keyboard(bot_me.username)
+        
+        await message.reply_photo(photo=input_file, caption=caption, reply_markup=keyboard)
 
 @dp.message(F.text.contains("سکه"))
 async def group_coin_listener(message: types.Message):
@@ -101,7 +138,12 @@ async def group_coin_listener(message: types.Message):
     if data and data['coin_emami'] != "نامشخص":
         photo_bytes = generate_price_banner("coin", "سکه امامی", data['coin_emami'])
         input_file = BufferedInputFile(photo_bytes.read(), filename="coin.png")
-        await message.reply_photo(photo=input_file, caption="🪙 قیمت لحظه‌ای سکه امامی (ریال)")
+        
+        caption = format_caption("سکه امامی", data['coin_emami'], data['usd'])
+        bot_me = await bot.get_me()
+        keyboard = get_add_to_group_keyboard(bot_me.username)
+        
+        await message.reply_photo(photo=input_file, caption=caption, reply_markup=keyboard)
 
 @dp.message(F.text.contains("طلا"))
 async def group_gold_listener(message: types.Message):
@@ -109,7 +151,12 @@ async def group_gold_listener(message: types.Message):
     if data and data['gold_18k'] != "نامشخص":
         photo_bytes = generate_price_banner("gold", "طلای 18 عیار (هر گرم)", data['gold_18k'])
         input_file = BufferedInputFile(photo_bytes.read(), filename="gold.png")
-        await message.reply_photo(photo=input_file, caption="🥇 قیمت لحظه‌ای طلای ۱۸ عیار (ریال)")
+        
+        caption = format_caption("1 گرم طلا 18 عیار", data['gold_18k'], data['usd'])
+        bot_me = await bot.get_me()
+        keyboard = get_add_to_group_keyboard(bot_me.username)
+        
+        await message.reply_photo(photo=input_file, caption=caption, reply_markup=keyboard)
 
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)

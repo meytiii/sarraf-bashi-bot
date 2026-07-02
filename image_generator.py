@@ -15,7 +15,7 @@ def generate_price_banner(banner_type, label_text, price_text):
     template_path = os.path.join("assets", template_name)
     
     if not os.path.exists(template_path):
-        img = Image.new("RGBA", (800, 400), (30, 30, 35, 255))
+        img = Image.new("RGBA", (1774, 887), (20, 20, 25, 255))
     else:
         img = Image.open(template_path).convert("RGBA")
         
@@ -23,51 +23,55 @@ def generate_price_banner(banner_type, label_text, price_text):
     draw = ImageDraw.Draw(img)
     
     font_path = os.path.join("assets", "fonts", "Vazirmatn-Bold.ttf")
-    label_font = ImageFont.truetype(font_path, 36)
-    price_font = ImageFont.truetype(font_path, 52)
+    label_font = ImageFont.truetype(font_path, 64)
+    price_font = ImageFont.truetype(font_path, 110)
+    watermark_font = ImageFont.truetype(font_path, 32)
     
-    reshaped_label = reshape(label_text)
-    display_label = get_display(reshaped_label)
+    disp_label = get_display(reshape(label_text))
+    disp_price = get_display(reshape(price_text))
     
-    reshaped_price = reshape(price_text)
-    display_price = get_display(reshaped_price)
+    label_width = draw.textlength(disp_label, font=label_font)
+    price_width = draw.textlength(disp_price, font=price_font)
     
-    label_width = draw.textlength(display_label, font=label_font)
-    label_height = 36
+    label_height = 64
+    price_height = 110
+    spacing = 30
+    total_content_height = label_height + price_height + spacing
     
-    price_width = draw.textlength(display_price, font=price_font)
-    price_height = 52
-    
-    spacing = 15
-    total_height = label_height + price_height + spacing
-    
-    start_y = (height - total_height) / 2
-    
-    card_w = max(label_width, price_width) + 100
-    card_h = total_height + 40
-    card_x1 = (width - card_w) / 2
-    card_y1 = start_y - 20
+    card_w = max(label_width, price_width) + 160
+    card_h = total_content_height + 100
+    card_x = (width - card_w) / 2
+    card_y = (height - card_h) / 2
     
     draw.rounded_rectangle(
-        [card_x1, card_y1, card_x1 + card_w, card_y1 + card_h],
-        radius=15,
-        fill=(0, 0, 0, 110)
+        [card_x, card_y, card_x + card_w, card_y + card_h],
+        radius=30,
+        fill=(10, 10, 12, 175)
     )
-
-    label_x = (width - label_width) / 2
-    draw.text((label_x, start_y), display_label, fill=(235, 235, 240, 180), font=label_font)
     
-    price_x = (width - price_width) / 2
-    price_y = start_y + label_height + spacing
+    draw.rounded_rectangle(
+        [card_x, card_y, card_x + card_w, card_y + card_h],
+        radius=30,
+        outline=(255, 255, 255, 30),
+        width=2
+    )
     
-    draw.text((price_x + 2, price_y + 2), display_price, fill=(0, 0, 0, 150), font=price_font)
-    draw.text((price_x, price_y), display_price, fill=(255, 255, 255, 255), font=price_font)
+    start_y = card_y + 50
     
-    watermark_text = "@sarraf_bashi_bot"
-    watermark_font = ImageFont.truetype(font_path, 20)
-    w_width = draw.textlength(watermark_text, font=watermark_font)
+    lx = (width - label_width) / 2
+    draw.text((lx, start_y), disp_label, fill=(255, 215, 0, 230), font=label_font)
     
-    draw.text((width - w_width - 35, height - 45), watermark_text, fill=(255, 255, 255, 120), font=watermark_font)
+    px = (width - price_width) / 2
+    py = start_y + label_height + spacing
+    
+    draw.text((px + 4, py + 4), disp_price, fill=(0, 0, 0, 180), font=price_font)
+    draw.text((px, py), disp_price, fill=(255, 255, 255, 255), font=price_font)
+    
+    watermark_text = "SARRAF BASHI BOT  •  قیمت لحظه‌ای بازار"
+    disp_wm = get_display(reshape(watermark_text))
+    wm_width = draw.textlength(disp_wm, font=watermark_font)
+    
+    draw.text(((width - wm_width) / 2, height - 80), disp_wm, fill=(255, 255, 255, 60), font=watermark_font)
 
     byte_io = io.BytesIO()
     img.save(byte_io, 'PNG')
