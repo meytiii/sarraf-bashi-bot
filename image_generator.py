@@ -30,9 +30,11 @@ def generate_price_banner(banner_type, label_text, price_text):
     reshaped_text = reshape(raw_full_text)
     final_text_rtl = get_display(reshaped_text)
     
-    bbox = draw.textbbox((0, 0), final_text_rtl, font=price_font)
-    text_width = bbox[2] - bbox[0]
-    text_height = bbox[3] - bbox[1]
+    text_width = draw.textlength(final_text_rtl, font=price_font)
+    text_height = 52
+    
+    x_pos = (width - text_width) / 2
+    y_pos = (height - text_height) / 2
     
     x_pos = (width - text_width) / 2
     y_pos = (height - text_height) / 2 - 10
