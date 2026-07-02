@@ -5,6 +5,7 @@ from datetime import datetime
 from PIL import Image, ImageDraw, ImageFont
 from arabic_reshaper import reshape
 from bidi.algorithm import get_display
+import re
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -15,7 +16,8 @@ def create_trend_graph(history_data, asset_key, color):
         return None
         
     dates = list(history_data[asset_key].keys())
-    values = list(history_data[asset_key].values())
+    
+    values = [float(v) / 10 for v in history_data[asset_key].values()]
     
     short_dates = []
     for d in dates:
@@ -30,8 +32,15 @@ def create_trend_graph(history_data, asset_key, color):
     fig.patch.set_alpha(0.0)
     ax.set_facecolor((0, 0, 0, 0))
     
+    min_val = min(values)
+    max_val = max(values)
+    padding = (max_val - min_val) * 0.15
+    if padding == 0:
+        padding = min_val * 0.05
+    ax.set_ylim(min_val - padding, max_val + padding)
+    
     ax.plot(short_dates, values, color=color, linewidth=5, marker='o', markersize=14, markerfacecolor='#1A1A1D', markeredgecolor=color, markeredgewidth=4)
-    ax.fill_between(short_dates, values, color=color, alpha=0.20)
+    ax.fill_between(short_dates, values, min_val - padding, color=color, alpha=0.20)
     
     ax.spines['top'].set_visible(False)
     ax.spines['right'].set_visible(False)
@@ -52,6 +61,18 @@ def create_trend_graph(history_data, asset_key, color):
     return Image.open(buf)
 
 def generate_price_banner(banner_type, label_text, price_text, change_val="0", change_pct="0", change_dir="", history_data=None):
+    try:
+        num_price = float(re.sub(r'[^\d.]', '', price_text))
+        price_text = f"{int(num_price / 10):,} تومان"
+    except Exception:
+        pass
+        
+    try:
+        num_change = float(re.sub(r'[^\d.]', '', str(change_val)))
+        change_val = f"{int(num_change / 10):,}"
+    except Exception:
+        pass
+
     banner_mapping = {
         "usd": "banner_usd.png",
         "coin": "banner_coin.png",
