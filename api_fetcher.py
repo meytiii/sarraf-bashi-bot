@@ -1,5 +1,6 @@
 import aiohttp
 import asyncio
+import re
 
 async def get_market_data():
     DATA_URL = "https://raw.githubusercontent.com/meytiii/sarraf-bashi-bot/main/data/tgju.json"
@@ -35,6 +36,7 @@ async def get_market_data():
                     results["gbp"] = get_price(["price_gbp", "gbp"])
                     results["iqd"] = get_price(["price_iqd", "iqd"])
                     results["try"] = get_price(["price_try", "try", "lira"])
+                    
                     results["gold_18k"] = get_price(["geram18", "tgju_gold_irg18", "gerami18", "price_gerami18", "gold18", "18ayar", "ayar18", "gerami", "mesghal_18"])
                     results["coin_emami"] = get_price(["sekee", "emami", "sekkeh_emami"])
                     results["coin_bahar"] = get_price(["sekeb", "sekeb_buy", "retail_sekeb", "bahar", "price_bahar", "sekkeh_bahar", "sekeh_bahar", "seke_bahar", "sekebahar", "sekkeh"])
@@ -49,11 +51,12 @@ async def get_market_data():
             print(f"🚨 TGJU Fetch Error: {e}")
             return None
 
+
 async def get_history_data():
     assets = {
-        "usd": "price_dollar_rl",
-        "coin_emami": "sekee",
-        "gold_18k": "geram18"
+        "usd": ["price_dollar_rl", "dollar_rl", "price_dollar_sm"],
+        "coin_emami": ["sekee", "emami", "sekkeh_emami"],
+        "gold_18k": ["geram18", "tgju_gold_irg18"]
     }
     history = {"usd": {}, "coin_emami": {}, "gold_18k": {}}
     timeout = aiohttp.ClientTimeout(total=10)
@@ -65,32 +68,26 @@ async def get_history_data():
     }
     
     async with aiohttp.ClientSession(connector=aiohttp.TCPConnector(ssl=False), timeout=timeout, headers=headers) as session:
-        for key, tgju_id in assets.items():
-            url = f"https://api.tgju.org/v1/market/indicator/summary-table-data/{tgju_id}?start=0&length=7"
-            try:
-                async with session.get(url) as response:
-                    if response.status == 200:
-                        data = await response.json()
-                        rows = data.get("data", [])
-                        
-                        rows.reverse()
-                        
-                        for row in rows:
-                            if len(row) >= 7:
-                                date_str = row[6].replace("/", "-") 
-                                price_str = row[3].replace(",", "")
-                                try:
-                                    history[key][date_str] = float(price_str)
-                                except ValueError:
-                                    continue
-            except Exception as e:
-                print(f"🚨 History API Fetch Error ({key}): {e}")
-                
+        for key, id_list in assets.items():
+            for tgju_id in id_list:
+                url = f"https://api.tgju.org/v1/market/indicator/summary-table-data/{tgju_id}?start=0&length=10"
+                try:
+                    async with session.get(url) as response:
+                        if response.status == 200:
+                            data = await response.json()
+                            rows = data.get("data", [])
+                            
+                            if rows:
+                                rows.reverse()
+                                for row in rows:
+                                    if len(row) >= 7:
+                                        date_str = row[6].replace("/", "-") 
+                                        price_str = re.sub(r'[^\d.]', '', row[3])
+                                        if price_str:
+                                            history[key][date_str] = float(price_str)
+                                
+                                break 
+                except Exception as e:
+                    print(f"🚨 History API Fetch Error ({key} -> {tgju_id}): {e}")
+                    
     return history
-
-if __name__ == "__main__":
-    async def test_api():
-        data = await get_market_data()
-        print(data)
-        
-    asyncio.run(test_api())
