@@ -61,9 +61,32 @@ def create_trend_graph(history_data, asset_key, color):
     return Image.open(buf)
 
 def generate_price_banner(banner_type, label_text, price_text, change_val="0", change_pct="0", change_dir="", history_data=None):
+    asset_map = {"usd": "usd", "coin": "coin_emami", "gold": "gold_18k"}
+    db_key = asset_map.get(banner_type)
+
     try:
         num_price = float(re.sub(r'[^\d.]', '', price_text))
-        price_text = f"تومان {int(num_price / 10):,}"
+        
+        if history_data and db_key in history_data and len(history_data[db_key]) > 0:
+            prices = list(history_data[db_key].values())
+            prev_close = float(prices[-1])
+            
+            if prev_close == num_price and len(prices) > 1:
+                prev_close = float(prices[-2])
+                
+            diff = num_price - prev_close
+            if prev_close > 0:
+                change_pct = f"{abs((diff / prev_close) * 100):.1f}"
+            change_val = str(abs(diff))
+            
+            if diff > 0:
+                change_dir = "high"
+            elif diff < 0:
+                change_dir = "low"
+            else:
+                change_dir = ""
+                
+        price_text = f"{int(num_price / 10):,} تومان"
     except Exception:
         pass
         
