@@ -96,8 +96,8 @@ def generate_price_banner(banner_type, label_text, price_text, change_val="0", c
     change_font = ImageFont.truetype(font_path, 38)
     watermark_font = ImageFont.truetype(font_path, 32)
     
-    disp_label = get_display(reshape(label_text))
-    disp_price = get_display(reshape(price_text))
+    disp_label = label_text
+    disp_price = price_text
     
     if change_dir == "high":
         c_color = (0, 255, 130, 255)
@@ -109,12 +109,11 @@ def generate_price_banner(banner_type, label_text, price_text, change_val="0", c
         c_color = (200, 200, 200, 255)
         arrow = "▬"
         
-    raw_change_text = f"{arrow} {change_val} ({change_pct}%)"
-    disp_change = get_display(reshape(raw_change_text))
+    disp_change = f"{arrow} {change_val} ({change_pct}%)"
     
-    label_width = draw.textlength(disp_label, font=label_font)
-    price_width = draw.textlength(disp_price, font=price_font)
-    change_width = draw.textlength(disp_change, font=change_font)
+    label_width = draw.textlength(disp_label, font=label_font, direction="rtl")
+    price_width = draw.textlength(disp_price, font=price_font, direction="rtl")
+    change_width = draw.textlength(disp_change, font=change_font, direction="rtl")
     
     label_height = 55
     price_height = 110
@@ -147,16 +146,16 @@ def generate_price_banner(banner_type, label_text, price_text, change_val="0", c
     
     start_y = card_y + int(padding_y / 2)
     lx = (width - label_width) / 2
-    draw.text((lx, start_y), disp_label, fill=(255, 215, 0, 240), font=label_font)
+    draw.text((lx, start_y), disp_label, fill=(255, 215, 0, 240), font=label_font, direction="rtl")
     
     px = (width - price_width) / 2
     py = start_y + label_height + spacing_top_to_price
-    draw.text((px + 5, py + 5), disp_price, fill=(0, 0, 0, 200), font=price_font)
-    draw.text((px, py), disp_price, fill=(255, 255, 255, 255), font=price_font)
+    draw.text((px + 5, py + 5), disp_price, fill=(0, 0, 0, 200), font=price_font, direction="rtl")
+    draw.text((px, py), disp_price, fill=(255, 255, 255, 255), font=price_font, direction="rtl")
     
     cx = (width - change_width) / 2
     cy = py + price_height + spacing_price_to_change
-    draw.text((cx, cy), disp_change, fill=c_color, font=change_font)
+    draw.text((cx, cy), disp_change, fill=c_color, font=change_font, direction="rtl")
     
     if has_graph:
         gx = int((width - graph_w) / 2)
@@ -164,8 +163,8 @@ def generate_price_banner(banner_type, label_text, price_text, change_val="0", c
         img.paste(graph_img, (gx, gy), graph_img)
     
     watermark_text = "SARRAF BASHI BOT  •  قیمت لحظه‌ای بازار"
-    disp_wm = get_display(reshape(watermark_text))
-    wm_width = draw.textlength(disp_wm, font=watermark_font)
+    disp_wm = watermark_text
+    wm_width = draw.textlength(disp_wm, font=watermark_font, direction="rtl")
     
     pill_pad_x = 50
     pill_pad_y = 18
@@ -179,7 +178,7 @@ def generate_price_banner(banner_type, label_text, price_text, change_val="0", c
     
     wm_x = pill_x + pill_pad_x
     wm_y = pill_y + pill_pad_y - 8
-    draw.text((wm_x, wm_y), disp_wm, fill=(255, 255, 255, 210), font=watermark_font)
+    draw.text((wm_x, wm_y), disp_wm, fill=(255, 255, 255, 210), font=watermark_font, direction="rtl")
 
     byte_io = io.BytesIO()
     img.save(byte_io, 'PNG')
