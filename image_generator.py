@@ -63,7 +63,7 @@ def create_trend_graph(history_data, asset_key, color):
 def generate_price_banner(banner_type, label_text, price_text, change_val="0", change_pct="0", change_dir="", history_data=None):
     try:
         num_price = float(re.sub(r'[^\d.]', '', price_text))
-        price_text = f"{int(num_price / 10):,} تومان"
+        price_text = f"تومان {int(num_price / 10):,}"
     except Exception:
         pass
         
@@ -96,8 +96,8 @@ def generate_price_banner(banner_type, label_text, price_text, change_val="0", c
     change_font = ImageFont.truetype(font_path, 38)
     watermark_font = ImageFont.truetype(font_path, 32)
     
-    disp_label = get_display(reshape(label_text), base_dir='R')
-    disp_price = get_display(reshape(price_text), base_dir='R')
+    disp_label = get_display(reshape(label_text))
+    disp_price = get_display(reshape(price_text))
     
     if change_dir == "high":
         c_color = (0, 255, 130, 255)
@@ -110,7 +110,7 @@ def generate_price_banner(banner_type, label_text, price_text, change_val="0", c
         arrow = "▬"
         
     raw_change_text = f"{arrow} {change_val} ({change_pct}%)"
-    disp_change = get_display(reshape(raw_change_text), base_dir='R')
+    disp_change = get_display(reshape(raw_change_text))
     
     label_width = draw.textlength(disp_label, font=label_font)
     price_width = draw.textlength(disp_price, font=price_font)
@@ -164,7 +164,7 @@ def generate_price_banner(banner_type, label_text, price_text, change_val="0", c
         img.paste(graph_img, (gx, gy), graph_img)
     
     watermark_text = "SARRAF BASHI BOT  •  قیمت لحظه‌ای بازار"
-    disp_wm = get_display(reshape(watermark_text), base_dir='R')
+    disp_wm = get_display(reshape(watermark_text))
     wm_width = draw.textlength(disp_wm, font=watermark_font)
     
     pill_pad_x = 50
