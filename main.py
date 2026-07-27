@@ -8,6 +8,7 @@ from aiogram import Bot, Dispatcher, types, F
 from aiogram.filters import CommandStart, Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, BufferedInputFile
 from dotenv import load_dotenv
+from aiohttp import web
 
 from api_fetcher import get_market_data, get_history_data
 from image_generator import generate_price_banner
@@ -188,9 +189,22 @@ async def group_gold_listener(message: types.Message):
         
         await message.reply_photo(photo=input_file, caption=caption, reply_markup=keyboard)
 
+async def health_check(request):
+    return web.Response(text="Sarraf Bashi Bot is alive!")
+
+async def start_web_server():
+    app = web.Application()
+    app.router.add_get('/', health_check)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    port = int(os.environ.get("PORT", 8080))
+    site = web.TCPSite(runner, '0.0.0.0', port)
+    await site.start()
+
 async def main() -> None:
     logging.basicConfig(level=logging.INFO)
     print("صراف‌باشی در حال اجراست... (Bot is starting...)")
+    await start_web_server()
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
