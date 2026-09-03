@@ -16,6 +16,11 @@ from image_generator import generate_price_banner
 load_dotenv()
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 
+if not BOT_TOKEN:
+    logging.basicConfig(level=logging.INFO)
+    logging.error("❌ BOT_TOKEN is not set! Please set the BOT_TOKEN environment variable in your hosting dashboard.")
+    raise SystemExit("Error: BOT_TOKEN environment variable is missing.")
+
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher()
 
